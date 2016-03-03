@@ -19,3 +19,6 @@ When starting multiple jenkins instances on one host, be sure to change the defa
 
 See examples directory of module an init.pp for now. If more documentation is required, plese ping felix.heppner@oose.de.
 
+The module is created using the skeleton from https://github.com/garethr/puppet-module-skeleton
+
+
