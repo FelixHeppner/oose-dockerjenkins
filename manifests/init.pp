@@ -52,9 +52,9 @@ class dockerjenkins(
 
   require docker
 
-  if $jenkins_id_dir != '' {
+  if $jenkins_id_dir != undef {
 
-    if $jenkins_scm_sync_git_repo != '' {
+    if $jenkins_scm_sync_git_repo != undef {
 
       require git
 
