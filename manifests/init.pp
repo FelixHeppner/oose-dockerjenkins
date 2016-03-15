@@ -41,13 +41,20 @@
 # A git repo (typically) created by jenkins scm-sync-plugin. The repo will be copied
 # to jenkins home in addition to the id_dir.
 #
+# [*jenkins_links*]
+# An optional list of links to other docker containers
+#
+# [*jenkins_depends*]
+# An optional list of containers this jenkins depends on and that have to be started before.
 class dockerjenkins(
   $jenkins_home_on_host = '/var/lib/jenkins_home',
   $jenkins_build_agent_port = '50000',
   $jenkins_web_port = '8080',
   $jenkins_name = 'jenkins',
   $jenkins_id_dir = undef,
-  $jenkins_scm_sync_git_repo = undef
+  $jenkins_scm_sync_git_repo = undef,
+  $jenkins_links = [],
+  $jenkins_depends = []
 ) {
 
   require docker
@@ -136,8 +143,9 @@ class dockerjenkins(
     ports   => ["${jenkins_web_port}:8080","${jenkins_build_agent_port}:50000"],
     volumes => ['/var/run/docker.sock:/var/run/docker.sock', '/usr/bin/docker:/usr/bin/docker' , "${jenkins_home_on_host}:/var/jenkins_home" ],
     env     => ['DOCKER_GID_ON_HOST=$(cat /etc/group | grep docker: | cut -d: -f3)'],
-    require => File[$jenkins_home_on_host],
-    
+    links   => $jenkins_links,
+    depends => $jenkins_depends,
+    require => File[$jenkins_home_on_host], 
   }
 
 }
