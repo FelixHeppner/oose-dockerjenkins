@@ -46,6 +46,10 @@
 #
 # [*jenkins_depends*]
 # An optional list of containers this jenkins depends on and that have to be started before.
+#
+# [*jenkins_docker_image_name*]
+# The optional docker image name to use. The default is 'oose/dockerjenkins:2'
+# 
 class dockerjenkins(
   $jenkins_home_on_host = '/var/lib/jenkins_home',
   $jenkins_build_agent_port = '50000',
@@ -54,7 +58,8 @@ class dockerjenkins(
   $jenkins_id_dir = undef,
   $jenkins_scm_sync_git_repo = undef,
   $jenkins_links = [],
-  $jenkins_depends = []
+  $jenkins_depends = [],
+  $jenkins_docker_image_name = 'oose/dockerjenkins:2'
 ) {
 
   require docker
@@ -138,7 +143,7 @@ class dockerjenkins(
   # Think about refactoring ....
   # run
   docker::run { $jenkins_name:
-    image   => 'oose/dockerjenkins',
+    image   => $jenkins_docker_image_name,
     tty     => false,
     ports   => ["${jenkins_web_port}:8080","${jenkins_build_agent_port}:50000"],
     volumes => ['/var/run/docker.sock:/var/run/docker.sock', '/usr/bin/docker:/usr/bin/docker' , "${jenkins_home_on_host}:/var/jenkins_home" ],
