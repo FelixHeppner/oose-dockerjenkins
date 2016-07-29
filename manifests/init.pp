@@ -50,6 +50,9 @@
 # [*jenkins_docker_image_name*]
 # The optional docker image name to use. The default is 'oose/dockerjenkins:2'
 # 
+# [*$jenkins_additional_volumes*]
+# A list of strings with volume mappings.
+# 
 class dockerjenkins(
   $jenkins_home_on_host = '/var/lib/jenkins_home',
   $jenkins_build_agent_port = '50000',
@@ -59,7 +62,8 @@ class dockerjenkins(
   $jenkins_scm_sync_git_repo = undef,
   $jenkins_links = [],
   $jenkins_depends = [],
-  $jenkins_docker_image_name = 'oose/dockerjenkins:2'
+  $jenkins_docker_image_name = 'oose/dockerjenkins:2',
+  $jenkins_additional_volumes = []
 ) {
 
   require docker
@@ -146,7 +150,11 @@ class dockerjenkins(
     image   => $jenkins_docker_image_name,
     tty     => false,
     ports   => ["${jenkins_web_port}:8080","${jenkins_build_agent_port}:50000"],
-    volumes => ['/var/run/docker.sock:/var/run/docker.sock', '/usr/bin/docker:/usr/bin/docker' , "${jenkins_home_on_host}:/var/jenkins_home" ],
+    volumes => concat(['/var/run/docker.sock:/var/run/docker.sock', 
+		'/usr/bin/docker:/usr/bin/docker',
+		"${jenkins_home_on_host}:/var/jenkins_home" ] ,
+		$jenkins_additional_volumes ),
+
     env     => ['DOCKER_GID_ON_HOST=$(cat /etc/group | grep docker: | cut -d: -f3)'],
     links   => $jenkins_links,
     depends => $jenkins_depends,
