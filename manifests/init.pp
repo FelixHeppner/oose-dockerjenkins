@@ -53,6 +53,12 @@
 # [*$jenkins_additional_volumes*]
 # A list of strings with volume mappings.
 # 
+# [*$jenkins_additional_env*]
+# A list of strings with environment definitions.
+#
+# [*jenkins_extra_parameters*]
+# Just pass to docker run
+#
 class dockerjenkins(
   $jenkins_home_on_host = '/var/lib/jenkins_home',
   $jenkins_build_agent_port = '50000',
@@ -63,7 +69,9 @@ class dockerjenkins(
   $jenkins_links = [],
   $jenkins_depends = [],
   $jenkins_docker_image_name = 'oose/dockerjenkins:2',
-  $jenkins_additional_volumes = []
+  $jenkins_additional_volumes = [],
+  $jenkins_additional_env = [],
+  $jenkins_extra_parameters = ''
 ) {
 
   require docker
@@ -155,8 +163,10 @@ class dockerjenkins(
 		"${jenkins_home_on_host}:/var/jenkins_home" ] ,
 		$jenkins_additional_volumes ),
 
-    env     => ['DOCKER_GID_ON_HOST=$(cat /etc/group | grep docker: | cut -d: -f3)'],
+    env     => concat(['DOCKER_GID_ON_HOST=$(cat /etc/group | grep docker: | cut -d: -f3)'],
+		      $jenkins_additional_env),
     links   => $jenkins_links,
+    extra_parameters => $jenkins_extra_parameters,
     depends => $jenkins_depends,
     require => File[$jenkins_home_on_host], 
   }
